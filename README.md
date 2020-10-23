@@ -8,4 +8,33 @@
 - c/gcc
 
 # 실행화면
-(이미지)
+
+ - 카드 받기
+ 
+ <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/1_discard.png" />
+
+ 자신의 카드만 보여지고 나머지 플레이어는 보여지는 카드에 대한 족보만 출력
+ 
+ - 카드 버리기
+ 
+ <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/2_showCard.png" />
+ 
+ 원하는 카드를 버림
+ 
+ - 컴퓨터 배팅
+ 
+ <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/3_cpubatt.png" />
+ 
+ 컴퓨터 플레이어는 자신의 족보의 가치에 비례하는 확률로 콜 및 다이를 선언, 죽은 플레이어는 출력 제외
+ 
+ - 플레이어 배팅
+ 
+ <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/4_playerBat.png" />
+ 
+ 사용자는 콜 및 다이를 매 카드를 받을 때마다 선언할 수 있음
+ 
+ - 결과
+ 
+ <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/5_result.png" />
+ 
+ 포기를 하지 않은 플레이어들의 모든 카드를 공개하고 공개된 플레이어 중 가장 족보가 높은 플레이어가 승리함

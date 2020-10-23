@@ -13,13 +13,13 @@
  
  <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/1_discard.png" />
 
- 자신의 카드만 보여지고 나머지 플레이어는 보여지는 카드에 대한 족보만 출력
+ 자신의 카드만 보여짐, 버릴 카드 선택
  
  - 카드 버리기
  
  <img src="https://github.com/cherrytomato1/poker_game/blob/main/pokerImage/2_showCard.png" />
  
- 원하는 카드를 버림
+ 원하는 카드를 버림, 자신 외의 필레이어는 보여진 카드에 의해 족보가 출력됨, 자신은 자신 전체 카드의 족보 출력
  
  - 컴퓨터 배팅
  

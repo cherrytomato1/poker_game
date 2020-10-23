@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
+#include<unistd.h>
+
 #define COL 4
 #define NUM 13
 #define PLY 5
@@ -25,7 +27,15 @@ typedef struct
         int std_res[PLY];
         int pl_stat[PLY];
 }data ;
-int distribute(data *dat,ocd **pc)
+
+void enter()
+{
+        int i;
+        for(i=0;i<100;i++)
+                printf("\n");
+}
+
+void distribute(data *dat,ocd **pc)
 {
         int p,rnu,rpa;
         for(p=0;p<PLY;p++)
@@ -53,7 +63,49 @@ int distribute(data *dat,ocd **pc)
         }
         dat->cn++;
 }
-int print(data *dat,ocd **pc,int p)
+void print_pat(int pat)
+{
+        switch(pat)
+        {
+                case 0 :
+                        printf("♣");
+                        break;
+                case 1 :
+                        printf("♡");
+                        break;
+                case 2 :
+                        printf("◇");
+                        break;
+                case 3 :
+                        printf("♠");
+                        break;
+                default :
+                        break;
+        }
+}
+void print_num(int num)
+{
+        switch(num)
+        {
+                case 9 :
+                        printf(" J");
+                        break;
+                case 10 :
+                        printf(" Q");
+                        break;
+                case 11 :
+                        printf(" K");
+                        break;
+                case 12 :
+                        printf(" A");
+                        break;
+                default :
+                        printf("%2d",num+2);
+                        break;
+        }
+}
+
+void print(data *dat,ocd **pc,int p)
 {
         int i,j;
         printf("         ▶ 플레이어 %d",p+1);
@@ -135,48 +187,8 @@ int print(data *dat,ocd **pc,int p)
         }
         printf("\n");
 }
-int print_pat(int pat)
-{
-        switch(pat)
-        {
-                case 0 :
-                        printf("♣");
-                        break;
-                case 1 :
-                        printf("♡");
-                        break;
-                case 2 :
-                        printf("◇");
-                        break;
-                case 3 :
-                        printf("♠");
-                        break;
-                default :
-                        break;
-        }
-}
-int print_num(int num)
-{
-        switch(num)
-        {
-                case 9 :
-                        printf(" J");
-                        break;
-                case 10 :
-                        printf(" Q");
-                        break;
-                case 11 :
-                        printf(" K");
-                        break;
-                case 12 :
-                        printf(" A");
-                        break;
-                default :
-                        printf("%2d",num+2);
-                        break;
-        }
-}
-int set(data *dat,ocd **pc)
+
+void set(data *dat,ocd **pc)
 {
         int i,j,k,l;
         srand(time(NULL));
@@ -203,7 +215,7 @@ int set(data *dat,ocd **pc)
         dat->cn=0;
         dat->cheat=0;
 }
-int sort(data *dat,ocd **pc)
+void sort(data *dat,ocd **pc)
 {
         int i,temp,p;
         for(p=0;p<PLY;p++)
@@ -234,7 +246,7 @@ int sort(data *dat,ocd **pc)
                 }
         }
 }
-int discard(data *dat,ocd **pc)
+void discard(data *dat,ocd **pc)
 {
         int dscd,p;
         printf("버릴 카드를 선택하세요 숫자 1~4\n");
@@ -249,7 +261,7 @@ int discard(data *dat,ocd **pc)
 //      printf("%d",dat->pc[p][dscd-1].stat);
 }
 
-int open(data *dat,ocd **pc)
+void open(data *dat,ocd **pc)
 {
         int opcd,p;
         printf("보여줄 카드를 선택하세요 숫자 1~3\n");
@@ -260,151 +272,7 @@ int open(data *dat,ocd **pc)
                 opcd=rand()%3;
                 pc[p][opcd].stat=1;
         }
-}
-int check(data *dat,ocd **pc,int i,int opc)                             //세그멘테이션 오류(오버플로우?)
-{
-        int j,nu,nu2,rs,rs2;
-        ocd num[HN],pat[HN];
-        for(j=0;j<HN;j++)
-        {
-                pat[j].patt=pc[i][j].patt;
-                pat[j].numb=pc[i][j].numb;
-                pat[j].stat=pc[i][j].stat;
-                num[j].patt=pc[i][j].patt;
-                num[j].numb=pc[i][j].numb;
-                num[j].stat=pc[i][j].stat;
-        }
-        if(opc==0)
-        {
-                for(j=0;j<HN;j++)
-                {
-                        if(pat[j].stat==2)
-                        {
-                                pat[j].patt=-1;
-                                pat[j].numb=-1;
-                        }
-
-                        if(num[j].stat==2)
-                        {
-                                num[j].patt=-1;
-                                num[j].numb=-1;
-                        }
-                }
-        }
-        if(dat->pl_stat[i]==2)
-        {
-                for(j=0;j<HN;j++)
-                {
-                                pat[j].patt=-1;
-                                pat[j].numb=-1;
-                                num[j].patt=-1;
-                                num[j].numb=-1;
-                }
-        }
-//      printf("P%d, %d %d %d %d %d %d %d \n",i,pat[0],pat[1],pat[2],pat[3],pat[4],pat[5],pat[6]);
-//      printf("플레이어%d ",i+1);
-        check_sortnum(num);
-        check_sortpat(pat);
-//      printf("p%d %d %d %d %d %d %d %d\n",i+1,num[0],num[1],num[2],num[3],num[4],num[5],num[6]);
-        rs=pair(num);
-        rs=triple(num,rs);
-        rs=fullhouse(num,rs);
-        rs=fourcard(num,rs);
-        rs2=straight(num,0);
-        rs2=rs2>70000?rs2:flush(pat,rs2);
-        dat->res[i]=rs>rs2?rs:rs2;
-        if(opc!=1)
-                res_sort(dat);
-//      if(dat->res[i]>=20000)
-//              dat->res[i]=twopair(num,pat,dat->res[i]);
-}
-int check_print(data *dat,ocd **pc,int i)
-{
-        int nu,nu2;
-        nu=(dat->res[i]%10000)/100;                             //1**00
-        nu2=dat->res[i]%100;                                    //100**
-//      printf(" %d ",dat->res[i]);
-        if(dat->res[i]<10000)
-        {
-                print_pat(nu2);
-                print_num(nu);
-                printf(" top");
-        }
-        else if(dat->res[i]>=10000&&dat->res[i]<30000)
-        {
-//              print_pat(nu2);
-                print_num(nu2);
-                printf(" Onepair");
-        }
-        else if(dat->res[i]>=40000&&dat->res[i]<50000)
-        {
-                print_num(nu);
-                print_num(nu2);
-                printf(" Twopair");
-        }
-        else if(dat->res[i]>=50000&&dat->res[i]<60000)
-        {
-//              print_num(nu);
-                print_num(nu2);
-                printf(" Triple");
-        }
-        else if(dat->res[i]>=60000&&dat->res[i]<63000)
-        {
-                print_num(nu);
-//              print_num(nu2);
-                printf(" Straight");
-        }
-        else if(dat->res[i]>=63000&&dat->res[i]<66000)
-        {
-//              print_num(nu);
-//              print_pat(nu2);
-                printf(" Back Straight");
-        }
-        else if(dat->res[i]>=66000&&dat->res[i]<70000)
-        {
-//              print_num(nu);
-//              print_pat(nu2);
-                printf(" Mountain");
-        }
-        else if(dat->res[i]>=70000&&dat->res[i]<80000)
-        {
-//              print_num(nu);
-                print_pat(nu2);
-                printf(" Flush");
-        }
-        else if(dat->res[i]>=80000&&dat->res[i]<90000)
-        {
-                print_num(nu);
-                print_num(nu2);
-                printf(" Full House");
-        }
-        else if(dat->res[i]>=90000&&dat->res[i]<100000)
-        {
-//              print_num(nu);
-                print_num(nu2);
-                printf(" Four Card");
-        }
-        else if(dat->res[i]>=130000&&dat->res[i]<133000)
-        {
-                print_pat(nu2);
-                print_num(nu);
-                printf(" Straight Flush");
-        }
-        else if(dat->res[i]>=133000&&dat->res[i]<136000)
-        {
-                print_pat(nu2);
-//              print_num(nu);
-                printf("Back Straight Flush");
-        }
-        else if(dat->res[i]>=136000&&dat->res[i]<146000)
-        {
-                print_pat(nu2);
-//              print_num(nu);
-                printf("Royal Straight Flush");
-        }
-}
-//int check_print(int res)
-int check_sortnum(ocd num[HN])
+}void check_sortnum(ocd num[HN])
 {
         int i,j,temp;
         for(i=0;i<HN;i++)
@@ -426,7 +294,7 @@ int check_sortnum(ocd num[HN])
                 }
         }
 }
-int check_sortpat(ocd num[HN])
+void check_sortpat(ocd num[HN])
 {
         int i,j,temp;
         for(i=0;i<HN;i++)
@@ -560,7 +428,7 @@ int flush(ocd num[HN],int res)
         }
         return res;
 }
-int res_sort(data *dat)
+void res_sort(data *dat)
 {
         int i,temp,j,temp_score[PLY];
 //      printf("res sor t check");
@@ -586,17 +454,153 @@ int res_sort(data *dat)
                 }
         }
 }
-int final(data *dat,ocd **pc)
+
+
+void check(data *dat,ocd **pc,int i,int opc)                             //세그멘테이션 오류(오버플로우?)
 {
-        dat->cheat=2;
-        tprint(dat,pc,2);
-        printf("승자는 ");
-        printf("플레이어 %d , 족보는 [",dat->std_res[PLY-1]+1);
-        check(dat,pc,dat->std_res[PLY-1],2);
-        check_print(dat,pc,dat->std_res[PLY-1]);
-        printf(" ] 입니다~\n");
+        int j,nu,nu2,rs,rs2;
+        ocd num[HN],pat[HN];
+        for(j=0;j<HN;j++)
+        {
+                pat[j].patt=pc[i][j].patt;
+                pat[j].numb=pc[i][j].numb;
+                pat[j].stat=pc[i][j].stat;
+                num[j].patt=pc[i][j].patt;
+                num[j].numb=pc[i][j].numb;
+                num[j].stat=pc[i][j].stat;
+        }
+        if(opc==0)
+        {
+                for(j=0;j<HN;j++)
+                {
+                        if(pat[j].stat==2)
+                        {
+                                pat[j].patt=-1;
+                                pat[j].numb=-1;
+                        }
+
+                        if(num[j].stat==2)
+                        {
+                                num[j].patt=-1;
+                                num[j].numb=-1;
+                        }
+                }
+        }
+        if(dat->pl_stat[i]==2)
+        {
+                for(j=0;j<HN;j++)
+                {
+                                pat[j].patt=-1;
+                                pat[j].numb=-1;
+                                num[j].patt=-1;
+                                num[j].numb=-1;
+                }
+        }
+//      printf("P%d, %d %d %d %d %d %d %d \n",i,pat[0],pat[1],pat[2],pat[3],pat[4],pat[5],pat[6]);
+//      printf("플레이어%d ",i+1);
+        check_sortnum(num);
+        check_sortpat(pat);
+//      printf("p%d %d %d %d %d %d %d %d\n",i+1,num[0],num[1],num[2],num[3],num[4],num[5],num[6]);
+        rs=pair(num);
+        rs=triple(num,rs);
+        rs=fullhouse(num,rs);
+        rs=fourcard(num,rs);
+        rs2=straight(num,0);
+        rs2=rs2>70000?rs2:flush(pat,rs2);
+        dat->res[i]=rs>rs2?rs:rs2; 
+        if(opc!=1)
+                res_sort(dat);
+//      if(dat->res[i]>=20000)
+//              dat->res[i]=twopair(num,pat,dat->res[i]);
 }
-int tprint(data *dat,ocd **pc,int opc)
+void check_print(data *dat,ocd **pc,int i)
+{
+        int nu,nu2;
+        nu=(dat->res[i]%10000)/100;                             //1**00
+        nu2=dat->res[i]%100;                                    //100**
+//      printf(" %d ",dat->res[i]);
+        if(dat->res[i]<10000)
+        {
+                print_pat(nu2);
+                print_num(nu);
+                printf(" top");
+        }
+        else if(dat->res[i]>=10000&&dat->res[i]<30000)
+        {
+//              print_pat(nu2);
+                print_num(nu2);
+                printf(" Onepair");
+        }
+        else if(dat->res[i]>=40000&&dat->res[i]<50000)
+        {
+                print_num(nu);
+                print_num(nu2);
+                printf(" Twopair");
+        }
+        else if(dat->res[i]>=50000&&dat->res[i]<60000)
+        {
+//              print_num(nu);
+                print_num(nu2);
+                printf(" Triple");
+        }
+        else if(dat->res[i]>=60000&&dat->res[i]<63000)
+        {
+                print_num(nu);
+//              print_num(nu2);
+                printf(" Straight");
+        }
+        else if(dat->res[i]>=63000&&dat->res[i]<66000)
+        {
+//              print_num(nu);
+//              print_pat(nu2);
+                printf(" Back Straight");
+        }
+        else if(dat->res[i]>=66000&&dat->res[i]<70000)
+        {
+//              print_num(nu);
+//              print_pat(nu2);
+                printf(" Mountain");
+        }
+        else if(dat->res[i]>=70000&&dat->res[i]<80000)
+        {
+//              print_num(nu);
+                print_pat(nu2);
+                printf(" Flush");
+        }
+        else if(dat->res[i]>=80000&&dat->res[i]<90000)
+        {
+                print_num(nu);
+                print_num(nu2);
+                printf(" Full House");
+        }
+        else if(dat->res[i]>=90000&&dat->res[i]<100000)
+        {
+//              print_num(nu);
+                print_num(nu2);
+                printf(" Four Card");
+        }
+        else if(dat->res[i]>=130000&&dat->res[i]<133000)
+        {
+                print_pat(nu2);
+                print_num(nu);
+                printf(" Straight Flush");
+        }
+        else if(dat->res[i]>=133000&&dat->res[i]<136000)
+        {
+                print_pat(nu2);
+//              print_num(nu);
+                printf("Back Straight Flush");
+        }
+        else if(dat->res[i]>=136000&&dat->res[i]<146000)
+        {
+                print_pat(nu2);
+//              print_num(nu);
+                printf("Royal Straight Flush");
+        }
+}
+//int check_print(int res)
+
+void tprint(data *dat,ocd **pc,int opc)
 {
         int p;
         enter();
@@ -637,7 +641,24 @@ int tprint(data *dat,ocd **pc,int opc)
                 }
         }
 }
-int batting(data *dat,ocd **pc,int opc)
+
+void final(data *dat,ocd **pc)
+{
+        dat->cheat=2;
+        tprint(dat,pc,2);
+        printf("승자는 ");
+        printf("플레이어 %d , 족보는 [",dat->std_res[PLY-1]+1);
+        check(dat,pc,dat->std_res[PLY-1],2);
+        check_print(dat,pc,dat->std_res[PLY-1]);
+        printf(" ] 입니다~\n");
+}
+void die_end(int j)
+{
+        printf("플레이어 %d를 제외한 모든 플레이어가 포기했습니다. \n 승자는 플레이어 %d 입니다! \n\n",j+1,j+1);
+        exit(0);
+}
+
+void batting(data *dat,ocd **pc,int opc)
 {
         int i,j,p,dp,cp;
         p=dat->std_res[PLY-1];
@@ -690,12 +711,8 @@ int batting(data *dat,ocd **pc,int opc)
                 }
         }
 }
-int die_end(int j)
-{
-        printf("플레이어 %d를 제외한 모든 플레이어가 포기했습니다. \n 승자는 플레이어 %d 입니다! \n\n",j+1,j+1);
-        exit(0);
-}
-int progress1(data *dat,ocd **pc)
+
+void progress1(data *dat,ocd **pc)
 {
         int i,j,opc=-1;
         for(i=0;i<4;i++)
@@ -715,7 +732,7 @@ int progress1(data *dat,ocd **pc)
         tprint(dat,pc,opc);
         getchar();
 }
-int progress2(data *dat,ocd **pc)
+void progress2(data *dat,ocd **pc)
 {
         int i,opc=0,p;
         for(i=0;i<3;i++)
@@ -735,12 +752,7 @@ int progress2(data *dat,ocd **pc)
         batting(dat,pc,opc);
         final(dat,pc);
 }
-int enter()
-{
-        int i;
-        for(i=0;i<100;i++)
-                printf("\n");
-}
+
 int main()
 {
         int i,p;
@@ -753,4 +765,5 @@ int main()
         progress1(&dat,pc);
         progress2(&dat,pc);
         free(pc);
-760 }
+        return 0;
+}
